@@ -1,20 +1,20 @@
-import dash
 from dash.dependencies import Input, Output, State
 import dash_table
 import dash_html_components as html
 import pandas as pd
 from dash.exceptions import PreventUpdate
+from app import app
 
-filepath = "data_table.csv"
+filepath = "./datasources/data_table.csv"
 with open(filepath) as infile:
     df = pd.read_csv(infile, sep=",")
 
 cols = [{'name': str(i), 'id': str(i)} for i in df.keys()]
 data_values = df.to_dict('records')
 
-app = dash.Dash(__name__)
+# app = dash.Dash(__name__)
 
-app.layout = html.Div([
+layout = html.Div([
     dash_table.DataTable(
         id='computed-table',
         columns=cols,
@@ -48,7 +48,7 @@ app.layout = html.Div([
 def update_columns(timestamp, rows):
     for row in rows:
         try:
-            row['Total'] = sum([float(value) for key, value in row.items() if key not in ['CPN', 'Total', 'output-data']])
+            row['Total'] = sum([float(value) for key, value in row.items() if key not in ['CPN', 'Total']])
         except:
             row['Total'] = 'NA'
     return rows
@@ -68,6 +68,6 @@ def submit_action(data, n_clicks):
         dfres.to_csv(filepath, index=False, header=True)
         return "Table saved"
 
-
-if __name__ == '__main__':
-    app.run_server(debug=True)
+#
+# if __name__ == '__main__':
+#     app.run_server(debug=True)
