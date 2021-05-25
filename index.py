@@ -8,7 +8,6 @@ from tabs import dash_table_exercise
 
 from app import app
 
-# app = dash.Dash(__name__)
 
 app.layout = html.Div([
     dcc.Tabs(id='tabs', value='tab-1', children=[
