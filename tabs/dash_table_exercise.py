@@ -4,15 +4,19 @@ import dash_html_components as html
 import pandas as pd
 from dash.exceptions import PreventUpdate
 from app import app
+from databasehandler import DataBaseHandler
 
 filepath = "./datasources/data_table.csv"
-with open(filepath) as infile:
-    df = pd.read_csv(infile, sep=",")
+# with open(filepath) as infile:
+#     df = pd.read_csv(infile, sep=",")
+# cols = [{'name': str(i), 'id': str(i)} for i in df.keys()]
+# data_values = df.to_dict('records')
 
-cols = [{'name': str(i), 'id': str(i)} for i in df.keys()]
-data_values = df.to_dict('records')
+DBH = DataBaseHandler(db_name="test_database")
+query_result = DBH.alloc.find({})
+data_values = [e for e in query_result]
+cols = [{'name': str(i), 'id': str(i)} for i in data_values[0]]
 
-# app = dash.Dash(__name__)
 
 layout = html.Div([
     dash_table.DataTable(
@@ -48,7 +52,8 @@ layout = html.Div([
 def update_columns(timestamp, rows):
     for row in rows:
         try:
-            row['Total'] = sum([float(value) for key, value in row.items() if key not in ['CPN', 'Total']])
+            row['Total'] = sum([float(value) for key, value in row.items() if key not in [
+                'CPN', '_id', 'Total', 'lastModified']])
         except:
             row['Total'] = 'NA'
     return rows
@@ -64,8 +69,12 @@ def submit_action(data, n_clicks):
         raise PreventUpdate
         # pass
     else:
-        dfres = pd.DataFrame(data)
-        dfres.to_csv(filepath, index=False, header=True)
+        # dfres = pd.DataFrame(data)
+        # dfres.to_csv(filepath, index=False, header=True)
+        # changed data become a string and are converted back to float before saving them to the database
+        data_float = [{k: (float(v) if k not in ['CPN', '_id', 'lastModified'] else v) for k, v in elem.items()}
+                      for elem in data]
+        DBH.fill_update(DBH.alloc, data_float)
         return "Table saved"
 
 #

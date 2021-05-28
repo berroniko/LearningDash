@@ -1,9 +1,27 @@
 import pymongo
 import pandas as pd
 
-
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 db = myclient["test_database"]
+
+
+def fill_update(collection, new_data):
+    """ updates collection based on dictionary"""
+    upserted = []
+    modified = []
+    for element in new_data:
+        # result = collection.update_one({"_id": element["_id"]}, {'$currentDate':  {"lastModified": {'$type': 'date'}}}, upsert=True)
+        result = collection.replace_one({"_id": element["_id"]}, element, upsert=True)
+        if result.upserted_id:
+            # print("inserted: {}".format(element))
+            upserted.append(element["_id"])
+            collection.update_one({"_id": element["_id"]}, {'$currentDate': {"lastModified": {'$type': 'date'}}})
+        elif result.modified_count:
+            # print("modified: {}".format(element))
+            modified.append(element["_id"])
+            collection.update_one({"_id": element["_id"]}, {'$currentDate': {"lastModified": {'$type': 'date'}}})
+    return {"upserted": upserted, "modified": modified}
+
 
 # ------------------------------- collection CPN        -----------------
 filepath = "./datasources/database_input.csv"
@@ -13,17 +31,12 @@ with open(filepath) as infile:
 # convert "CPN" to "_id" as string
 df.CPN = df.CPN.astype(str)
 df.rename(columns={"CPN": "_id"}, inplace=True)
-new_data = df.to_dict('records')
+cpn_dict = df.to_dict('records')
 
-collection = db["cpn"]
+cpn = db["cpn"]
 
-for element in new_data:
-    result = collection.replace_one({"_id": element["_id"]}, element, upsert=True)
-    if result.upserted_id:
-        print("inserted: {}".format(element))
-    elif result.modified_count:
-        print("modified: {}".format(element))
-
+res = fill_update(collection=cpn, new_data=cpn_dict)
+print(res)
 
 # ------------------------------- collection allocation -----------------
 filepath = "./datasources/data_table.csv"
@@ -33,12 +46,8 @@ with open(filepath) as infile:
 # convert "CPN" to "_id" as string
 df.CPN = df.CPN.astype(str)
 df.rename(columns={"CPN": "_id"}, inplace=True)
-new_data = df.to_dict('records')
+alloc_dict = df.to_dict('records')
 allocation = db["allocation"]
 
-for element in new_data:
-    result = allocation.replace_one({"_id": element["_id"]}, element, upsert=True)
-    if result.upserted_id:
-        print("inserted: {}".format(element))
-    elif result.modified_count:
-        print("modified: {}".format(element))
+res = fill_update(collection=allocation, new_data=alloc_dict)
+print(res)
