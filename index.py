@@ -5,6 +5,7 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output
 
 from tabs import dash_table_exercise
+from tabs import spent
 
 from app import app
 
@@ -23,18 +24,7 @@ def render_content(tab):
     if tab == 'tab-1':
         return dash_table_exercise.layout
     elif tab == 'tab-2':
-        return html.Div([
-            dcc.Graph(
-                figure={
-                    'data': [
-                        {'x': [1, 2, 3], 'y': [1, 4, 1],
-                         'type': 'bar', 'name': 'SF'},
-                        {'x': [1, 2, 3], 'y': [1, 2, 3],
-                         'type': 'bar', 'name': u'Montréal'},
-                    ]
-                }
-            )
-        ])
+        return spent.layout
 
 
 if __name__ == '__main__':

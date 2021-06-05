@@ -1,3 +1,7 @@
+# not needed anymore, using databasehandler.py instead
+# still useful to refresh the database from csv if something got wrong
+
+
 import pymongo
 import pandas as pd
 

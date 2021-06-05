@@ -6,17 +6,16 @@ from dash.exceptions import PreventUpdate
 from app import app
 from databasehandler import DataBaseHandler
 
-filepath = "./datasources/data_table.csv"
-# with open(filepath) as infile:
-#     df = pd.read_csv(infile, sep=",")
-# cols = [{'name': str(i), 'id': str(i)} for i in df.keys()]
-# data_values = df.to_dict('records')
 
 DBH = DataBaseHandler(db_name="test_database")
 query_result = DBH.alloc.find({})
 data_values = [e for e in query_result]
 cols = [{'name': str(i), 'id': str(i)} for i in data_values[0]]
 
+# display _id as CPN
+for elem in cols:
+    if elem["name"] == "_id":
+        elem["name"] = "CPN"
 
 layout = html.Div([
     dash_table.DataTable(
@@ -67,16 +66,9 @@ def update_columns(timestamp, rows):
 def submit_action(data, n_clicks):
     if n_clicks is None:
         raise PreventUpdate
-        # pass
     else:
-        # dfres = pd.DataFrame(data)
-        # dfres.to_csv(filepath, index=False, header=True)
         # changed data become a string and are converted back to float before saving them to the database
         data_float = [{k: (float(v) if k not in ['CPN', '_id', 'lastModified'] else v) for k, v in elem.items()}
                       for elem in data]
         DBH.fill_update(DBH.alloc, data_float)
         return "Table saved"
-
-#
-# if __name__ == '__main__':
-#     app.run_server(debug=True)

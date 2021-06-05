@@ -1,4 +1,6 @@
 import pymongo
+import pickle
+from datetime import datetime
 import pandas as pd
 
 
@@ -11,6 +13,7 @@ class DataBaseHandler(object):
         client = pymongo.MongoClient(host_port)
         self.db = client[db_name]
         self.cpn = self.db["cpn"]
+        self.cats = self.db["cats"]
         self.alloc = self.db["allocation"]
 
     def fill_update(self, collection, new_data):
@@ -31,25 +34,43 @@ class DataBaseHandler(object):
                 collection.update_one({"_id": element["_id"]}, {'$currentDate': {"lastModified": {'$type': 'date'}}})
         return {"upserted": upserted, "modified": modified}
     
-    # def find(self, collection, query):
-    #     return collection.find(query)
+    def fill_cats(self, new_data):
+        """deletes and refills the collection cats based on a list of dictionaries,
+        adds the nr of the week to each row"""
+        self.cats.delete_many({})
+        for elem in new_data:
+            elem["week"] = datetime.strptime(elem["day"], "%Y-%m-%d").isocalendar()[1]
+        self.cats.insert_many(new_data)
+        return
+
 
 
 if __name__ == '__main__':
     DBH = DataBaseHandler(db_name="test_database")
 
-    # CPN
-    filepath = "./datasources/database_input.csv"
-    with open(filepath) as infile:
-        df = pd.read_csv(infile, sep=",")
+    # cats from pickle to database
+    with open('./datasources/cats.pickle', 'rb') as handle:
+        new_data = pickle.load(handle)
+    DBH.fill_cats(new_data=new_data)
 
-    # convert "CPN" to "_id" as string
-    df.CPN = df.CPN.astype(str)
-    df.rename(columns={"CPN": "_id"}, inplace=True)
-    new_data = df.to_dict('records')
 
-    res = DBH.fill_update(DBH.cpn, new_data)
-    print(res)
 
-    result = DBH.alloc.find({})
-    for elem in result: print(elem)
+
+
+    # # CPN
+    # filepath = "./datasources/database_input.csv"
+    # with open(filepath) as infile:
+    #     df = pd.read_csv(infile, sep=",")
+    #
+    # # convert "CPN" to "_id" as string
+    # df.CPN = df.CPN.astype(str)
+    # df.rename(columns={"CPN": "_id"}, inplace=True)
+    # new_data = df.to_dict('records')
+    #
+    # res = DBH.fill_update(DBH.cpn, new_data)
+    # print(res)
+    #
+    # result = DBH.alloc.find({})
+    # for elem in result: print(elem)
+
+
