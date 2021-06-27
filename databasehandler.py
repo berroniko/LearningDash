@@ -15,6 +15,8 @@ class DataBaseHandler(object):
         self.cpn = self.db["cpn"]
         self.cats = self.db["cats"]
         self.alloc = self.db["allocation"]
+        self.settings = self.db["settings"]
+        self.request = self.db["request"]
 
     def fill_update(self, collection, new_data):
         """ updates collection based on dictionary"""
@@ -48,14 +50,15 @@ class DataBaseHandler(object):
 if __name__ == '__main__':
     DBH = DataBaseHandler(db_name="test_database")
 
-    # cats from pickle to database
-    with open('./datasources/cats.pickle', 'rb') as handle:
-        new_data = pickle.load(handle)
-    DBH.fill_cats(new_data=new_data)
+    result = DBH.cpn.find({},{"_id": 1})
+    for i in result: print(i)
 
 
 
-
+    # # cats from pickle to database
+    # with open('./datasources/cats.pickle', 'rb') as handle:
+    #     new_data = pickle.load(handle)
+    # DBH.fill_cats(new_data=new_data)
 
     # # CPN
     # filepath = "./datasources/database_input.csv"

@@ -6,6 +6,7 @@ from dash.dependencies import Input, Output
 
 from tabs import dash_table_exercise
 from tabs import spent
+from tabs import settings
 
 from app import app
 
@@ -14,6 +15,7 @@ app.layout = html.Div([
     dcc.Tabs(id='tabs', value='tab-1', children=[
         dcc.Tab(label='Table', value='tab-1'),
         dcc.Tab(label='Graph', value='tab-2'),
+        dcc.Tab(label='Sources', value='tab-3'),
     ]),
     html.Div(id='tabs-content')
 ])
@@ -25,6 +27,8 @@ def render_content(tab):
         return dash_table_exercise.layout
     elif tab == 'tab-2':
         return spent.layout
+    elif tab == 'tab-3':
+        return settings.layout
 
 
 if __name__ == '__main__':

@@ -12,7 +12,6 @@ query_result = DBH.alloc.find({})
 data_values = [e for e in query_result]
 cols = [{'name': str(i), 'id': str(i)} for i in data_values[0]]
 
-# display _id as CPN
 for elem in cols:
     if elem["name"] == "_id":
         elem["name"] = "CPN"

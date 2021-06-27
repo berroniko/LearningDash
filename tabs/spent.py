@@ -8,15 +8,9 @@ from app import app
 
 DBH = DataBaseHandler(db_name="test_database")
 
-cpn_selection=["01-005985", "01-000123"]
-pers_selection=["01565483", "0234982"]
-query_result = DBH.cats.find({"cpn": {"$in": cpn_selection}, "pers": {"$in": pers_selection}})
-
-# d=defaultdict(float)
-# total=0
-# for elem in query_result:
-#     d[elem["week"]] += elem["hours"]
-#     total += elem["hours"]
+# cpn_selection=["01-005985", "01-000123"]
+# pers_selection=["01565483", "0234982"]
+# query_result = DBH.cats.find({"cpn": {"$in": cpn_selection}, "pers": {"$in": pers_selection}})
 
 # find the available CPNs for dropdown
 res = DBH.cpn.find({}, {"_id": 1}).sort("_id", 1)
@@ -33,7 +27,8 @@ layout = html.Div([
     ),
             dcc.Graph(id='graph_weekly_booking'),
             html.Br(),
-            html.Div(id='resulting_total')
+            html.Div(id='resulting_total', style={
+        'textAlign': 'center'})
     ])
 
 @app.callback(
