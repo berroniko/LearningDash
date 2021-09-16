@@ -19,40 +19,54 @@ for elem in cols:
     if elem["name"] == "_id":
         elem["name"] = "CPN"
 
-layout = html.Div([
-    dash_table.DataTable(
-        id='computed-table',
-        columns=cols,
-        data=data_values,  # the contents of the table
-        editable=True,  # allow editing of data inside all cells
-        filter_action="native",  # allow filtering of data by user ('native') or not ('none')
-        sort_action="native",  # enables data to be sorted per-column by user or not ('none')
-        sort_mode="single",  # sort across 'multi' or 'single' columns
-        column_selectable="multi",  # allow users to select 'multi' or 'single' columns
-        row_selectable="multi",  # allow users to select 'multi' or 'single' rows
-        selected_columns=[],  # ids of columns that user selects
-        selected_rows=[],  # indices of rows that user selects
-        page_action="native",  # all data is passed to the table up-front or not ('none')
-        # export_format="csv",
-        # export_headers='ids',
-        style_cell={  # ensure adequate header width when text is shorter than cell's text
-            'minWidth': 40, 'maxWidth': 95, 'width': 50
-        },
-        style_data_conditional=[
-            {
-                'if': {
-                    'column_id': 'Total',
-                },
-                'backgroundColor': 'grey',
-                'color': 'white'
-            }
-        ]
-    ),
-    html.Br(),
-    html.Button('Save', id='save-button'),
-    html.Br(),
-    html.Div(id='output-state')
-])
+layout = html.Div(
+    [
+        dbc.Row(
+            dbc.Col(
+                html.Div(
+                        dash_table.DataTable(
+                            id='computed-table',
+                            columns=cols,
+                            data=data_values,  # the contents of the table
+                            editable=True,  # allow editing of data inside all cells
+                            filter_action="native",  # allow filtering of data by user ('native') or not ('none')
+                            sort_action="native",  # enables data to be sorted per-column by user or not ('none')
+                            sort_mode="single",  # sort across 'multi' or 'single' columns
+                            column_selectable="multi",  # allow users to select 'multi' or 'single' columns
+                            row_selectable="multi",  # allow users to select 'multi' or 'single' rows
+                            selected_columns=[],  # ids of columns that user selects
+                            selected_rows=[],  # indices of rows that user selects
+                            page_action="native",  # all data is passed to the table up-front or not ('none')
+                            # export_format="csv",
+                            # export_headers='ids',
+                            style_cell={  # ensure adequate header width when text is shorter than cell's text
+                                'minWidth': 40, 'maxWidth': 95, 'width': 50
+                            },
+                            style_data_conditional=[
+                                {
+                                    'if': {
+                                        'column_id': 'Total',
+                                    },
+                                    'backgroundColor': 'grey',
+                                    'color': 'white'
+                                }]
+                             )
+                        ),
+                width={"size": 10, "offset": 1},
+                className="pt-5"
+            )
+        ),
+        dbc.Row(
+            dbc.Col([
+                    html.Button('Save', id='save-button'),
+                    html.Div(id='output-state')],
+                width={"size": 10, "offset": 1},
+                className="mt-3"
+            )
+        )
+    ]
+)
+
 
 
 @app.callback(
