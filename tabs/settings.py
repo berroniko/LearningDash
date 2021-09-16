@@ -12,6 +12,10 @@ DBH = DataBaseHandler(db_name="test_database")
 # query_result = DBH.settings.find({})
 # set_dic={}
 # set_dic["CATS France"]=DBH.settings.find_one({"name": "CATS France"})["setting"]
+# print(set_dic["CATS France"])
+predefined = DBH.settings.find_one({"name": "CATS France"})["setting"]
+# TODO how to refresh the page when switching to this tab
+# BUT callbacks should never modify variables outside their scope
 
 size_left = 7
 size_right = 4
@@ -131,8 +135,8 @@ layout = dbc.Container([
                 dbc.Col(
                     html.Div(
                         [
-                            dbc.Input(id="input", placeholder="existing filename", type="text", bs_size="md",
-                                      className="mb-3"),
+                            dbc.Input(id="input", placeholder="filename", type="text", bs_size="md",
+                                      value= None, className="mb-3"),
                             dbc.FormText("CATS Germany"),
                             html.Br(),
                             html.P(id="output")
@@ -147,12 +151,12 @@ layout = dbc.Container([
                 dbc.Col(
                     html.Div(
                         [
-                            dbc.Input(id="cats_f",
+                            dbc.Input(id="cats_f", value=predefined, placeholder="filename",
                                       type="text", bs_size="md",
                                       className="mb-3", debounce=True),
                             dbc.FormText("CATS France"),
                             html.Br(),
-                            html.P(id="output")
+                            html.Div(id="output"),
                         ]
                     ),
                     width={'size': 12, "offset": 0},
@@ -181,9 +185,9 @@ layout = dbc.Container([
 
 
 @app.callback(
+    # Output("output", "children"),
     Output("cats_f", "placeholder"),
-    # Output("cats_f", "placeholder"),
-    [Input("cats_f", "value")])
+    Input("cats_f", "value"))
 def send_to_mongo(value):
     if value is None:
         return DBH.settings.find_one({"name": "CATS France"})["setting"]

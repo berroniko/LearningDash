@@ -5,12 +5,15 @@ import pandas as pd
 from dash.exceptions import PreventUpdate
 from app import app
 from databasehandler import DataBaseHandler
+from dash_table.Format import Format, Scheme
+import dash_bootstrap_components as dbc
 
 
 DBH = DataBaseHandler(db_name="test_database")
 query_result = DBH.alloc.find({})
 data_values = [e for e in query_result]
-cols = [{'name': str(i), 'id': str(i)} for i in data_values[0]]
+col_total = dict(id='Total', name='Total', type='numeric', format=Format(precision=0, scheme=Scheme.fixed))
+cols = [col_total if i == "Total" else {'id': str(i), 'name': str(i)} for i in data_values[0]]
 
 for elem in cols:
     if elem["name"] == "_id":
@@ -35,6 +38,15 @@ layout = html.Div([
         style_cell={  # ensure adequate header width when text is shorter than cell's text
             'minWidth': 40, 'maxWidth': 95, 'width': 50
         },
+        style_data_conditional=[
+            {
+                'if': {
+                    'column_id': 'Total',
+                },
+                'backgroundColor': 'grey',
+                'color': 'white'
+            }
+        ]
     ),
     html.Br(),
     html.Button('Save', id='save-button'),

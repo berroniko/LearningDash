@@ -10,7 +10,6 @@ from tabs import settings
 
 from app import app
 
-
 app.layout = html.Div([
     dcc.Tabs(id='tabs', value='tab-1', children=[
         dcc.Tab(label='Table', value='tab-1'),
